@@ -24,6 +24,7 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 			'de': u'Nur ausgewählte Anfasser',
 			'fr': u'seulement les poignées sélectionnées',
 			'es': u'los manejadores seleccionados',
+			'jp': u'選択したポイントのハンドル',
 		})
 		self.selectedColor = NSColor.labelColor() # NSColor.colorWithRed_green_blue_alpha_(0.0, 0.0, 0.0, 1.0)
 		self.unselectedColor = NSColor.secondaryLabelColor() # NSColor.colorWithRed_green_blue_alpha_(0.4, 0.4, 0.4, 1.0)
