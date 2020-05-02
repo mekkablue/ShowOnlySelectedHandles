@@ -28,6 +28,7 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 		})
 		self.selectedColor = NSColor.labelColor() # NSColor.colorWithRed_green_blue_alpha_(0.0, 0.0, 0.0, 1.0)
 		self.unselectedColor = NSColor.secondaryLabelColor() # NSColor.colorWithRed_green_blue_alpha_(0.4, 0.4, 0.4, 1.0)
+		self.originalShowNodesSetting = 1
 	
 	@objc.python_method
 	def conditionsAreMetForDrawing(self):
@@ -50,7 +51,7 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 				nodeCount = len(thisPath.nodes)
 				for i in range(nodeCount):
 					currNode = thisPath.nodes[i]
-					if currNode.selected:
+					if currNode in layer.selection:
 						# always draw selected nodes
 						self.selectedColor.set()
 						self.drawHandleForNode(currNode)
@@ -62,7 +63,7 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 						# draw handles surrounding the selection
 						prevNode = thisPath.nodes[(i-1)%nodeCount]
 						nextNode = thisPath.nodes[(i+1)%nodeCount]
-						if prevNode.selected or nextNode.selected:
+						if prevNode in layer.selection or nextNode in layer.selection:
 							self.unselectedColor.set()
 							self.drawHandleForNode(currNode)
 	
@@ -83,7 +84,7 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 					if handle.type == OFFCURVE:
 						prevNode = thisPath.nodes[(i-1)%nodeCount]
 						nextNode = thisPath.nodes[(i+1)%nodeCount]
-						if handle.selected or prevNode.selected or nextNode.selected:
+						if handle in layer.selection or prevNode in layer.selection or nextNode in layer.selection:
 							nearestOnCurve = prevNode if prevNode.type!=OFFCURVE else nextNode
 							NSBezierPath.strokeLineFromPoint_toPoint_(
 								handle.position,
