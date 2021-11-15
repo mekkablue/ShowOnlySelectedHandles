@@ -22,6 +22,7 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 		self.menuName = Glyphs.localize({
 			'en': u'Only Selected Handles',
 			'de': u'Nur ausgewählte Anfasser',
+			'es': u'únicamente manejadores seleccionados',
 			'fr': u'seulement les poignées sélectionnées',
 			'es': u'los manejadores seleccionados',
 			'jp': u'選択したポイントのハンドル',

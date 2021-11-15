@@ -2,7 +2,7 @@
 
 This is a plugin for the [Glyphs font editor](http://glyphsapp.com/) by Georg Seifert. 
 
-*View > Show Only Selected Handles* (de: *Nur ausgewählte Anfasser anzeigen,* fr: *Afficher seulement les poignées sélectionnées,* es: *Mostrar los manejadores seleccionados*) will display handles only when they are selected. You can set a keyboard shortcut in System Preferences.
+*View > Show Only Selected Handles* (de: *Nur ausgewählte Anfasser anzeigen,* es: *Mostrar únicamente manejadores seleccionados,* fr: *Afficher seulement les poignées sélectionnées,* es: *Mostrar los manejadores seleccionados*) will display handles only when they are selected. You can set a keyboard shortcut in System Preferences.
 
 ![Show Only Selected Handles](ShowOnlySelectedHandles.png)
 
