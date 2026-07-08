@@ -13,8 +13,10 @@
 
 from __future__ import division, print_function, unicode_literals
 import objc
-from GlyphsApp import *
-from GlyphsApp.plugins import *
+from GlyphsApp import Glyphs, OFFCURVE
+from GlyphsApp.plugins import ReporterPlugin
+from Cocoa import NSColor, NSBezierPath, NSRect, NSPoint, NSSize, NSClassFromString
+
 
 class ShowOnlySelectedHandles(ReporterPlugin):
 	@objc.python_method
@@ -23,28 +25,28 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 			'en': u'Only Selected Handles',
 			'de': u'Nur ausgewählte Anfasser',
 			'es': u'únicamente manejadores seleccionados',
-			'fr': u'seulement les poignées sélectionnées',
 			'es': u'los manejadores seleccionados',
+			'fr': u'seulement les poignées sélectionnées',
 			'jp': u'選択したポイントのハンドル',
 		})
 		self.selectedColor = NSColor.labelColor() # NSColor.colorWithRed_green_blue_alpha_(0.0, 0.0, 0.0, 1.0)
 		self.unselectedColor = NSColor.secondaryLabelColor() # NSColor.colorWithRed_green_blue_alpha_(0.4, 0.4, 0.4, 1.0)
 		self.originalShowNodesSetting = 1
-	
+
 	@objc.python_method
 	def conditionsAreMetForDrawing(self):
 		"""
 		Don't activate if text or pan (hand) tool are active.
 		"""
-		currentController = self.controller.view().window().windowController()
+		currentController = self.controller.windowController()
 		if currentController:
 			tool = currentController.toolDrawDelegate()
-			textToolIsActive = tool.isKindOfClass_( NSClassFromString("GlyphsToolText") )
-			handToolIsActive = tool.isKindOfClass_( NSClassFromString("GlyphsToolHand") )
-			if not textToolIsActive and not handToolIsActive: 
+			textToolIsActive = tool.isKindOfClass_(NSClassFromString("GlyphsToolText"))
+			handToolIsActive = tool.isKindOfClass_(NSClassFromString("GlyphsToolHand"))
+			if not textToolIsActive and not handToolIsActive:
 				return True
 		return False
-	
+
 	@objc.python_method
 	def foreground(self, layer):
 		if self.conditionsAreMetForDrawing():
@@ -67,7 +69,7 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 						if prevNode in layer.selection or nextNode in layer.selection:
 							self.unselectedColor.set()
 							self.drawHandleForNode(currNode)
-	
+
 	@objc.python_method
 	def background(self, layer):
 		if self.conditionsAreMetForDrawing():
@@ -76,40 +78,40 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 
 			# save original line width setting
 			oldLineWidth = NSBezierPath.lineWidth()
-			NSBezierPath.setLineWidth_(1.0/self.getScale())
-		
+			NSBezierPath.setLineWidth_(1.0 / self.getScale())
+
 			for thisPath in layer.paths:
 				nodeCount = len(thisPath.nodes)
 				for i in range(nodeCount):
 					handle = thisPath.nodes[i]
 					if handle.type == OFFCURVE:
-						prevNode = thisPath.nodes[(i-1)%nodeCount]
-						nextNode = thisPath.nodes[(i+1)%nodeCount]
+						prevNode = thisPath.nodes[(i - 1) % nodeCount]
+						nextNode = thisPath.nodes[(i + 1) % nodeCount]
 						if handle in layer.selection or prevNode in layer.selection or nextNode in layer.selection:
-							nearestOnCurve = prevNode if prevNode.type!=OFFCURVE else nextNode
+							nearestOnCurve = prevNode if prevNode.type != OFFCURVE else nextNode
 							NSBezierPath.strokeLineFromPoint_toPoint_(
 								handle.position,
 								nearestOnCurve.position,
 							)
-		
+
 			# restore original line width
 			NSBezierPath.setLineWidth_(oldLineWidth)
-				
+
 	@objc.python_method
 	def drawHandleForNode(self, node):
 		# calculate handle size:
 		handleSizes = (5, 8, 12) # possible user settings
 		handleSizeIndex = Glyphs.handleSize # user choice in Glyphs > Preferences > User Preferences > Handle Size
 		handleSize = handleSizes[handleSizeIndex]*self.getScale()**-0.9 # scaled diameter
-	
+
 		# offcurves are a little smaller:
 		if node.type == OFFCURVE:
 			handleSize *= 0.8
-	
+
 		# selected handles are a little bigger:
 		if node.selected:
 			handleSize *= 1.45
-	
+
 		# draw disc inside a rectangle around point position:
 		position = node.position
 		rect = NSRect()
@@ -119,7 +121,7 @@ class ShowOnlySelectedHandles(ReporterPlugin):
 			NSBezierPath.bezierPathWithOvalInRect_(rect).fill()
 		else:
 			NSBezierPath.bezierPathWithRect_(rect).fill()
-	
+
 	@objc.python_method
 	def __file__(self):
 		"""Please leave this method unchanged"""
